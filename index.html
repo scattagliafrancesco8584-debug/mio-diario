@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Il mio diario</title>
+</head>
+<body>
+  <h1>Il mio diario</h1>
+
+  <!-- Area per scrivere i pensieri -->
+  <textarea id="diario" rows="10" cols="50" placeholder="Scrivi qui i tuoi pensieri..."></textarea>
+  <br><br>
+
+  <!-- Menù emozioni -->
+  <label for="emozione">Emozione: </label>
+  <select id="emozione">
+    <option value="felice">Felice</option>
+    <option value="triste">Triste</option>
+    <option value="arrabbiato">Arrabbiato</option>
+    <option value="sorpreso">Sorpreso</option>
+    <option value="ansioso">Ansioso</option>
+  </select>
+  <br><br>
+
+  <!-- Pulsante Salva -->
+  <button onclick="salva()">Salva</button>
+
+  <!-- Lista dei pensieri -->
+  <h2>Le mie giornate</h2>
+  <ul id="lista"></ul>
+
+  <!-- Script per salvare e mostrare i pensieri -->
+  <script>
+    function salva() {
+      const testo = document.getElementById('diario').value;
+      if(testo.trim() === "") return;
+
+      const data = new Date().toLocaleString();
+      const emozione = document.getElementById('emozione').value;
+      const voce = data + " [" + emozione + "]: " + testo;
+
+      let lista = JSON.parse(localStorage.getItem('diario')) || [];
+      lista.push(voce);
+      localStorage.setItem('diario', JSON.stringify(lista));
+
+      mostraLista();
+      document.getElementById('diario').value = "";
+    }
+
+function mostraLista() {
+  const lista = JSON.parse(localStorage.getItem('diario')) || [];
+  const ul = document.getElementById('lista');
+  ul.innerHTML = "";
+
+  lista.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.style.listStyle = "none"; // rimuove i pallini standard
+    li.style.padding = "5px 10px";
+    li.style.marginBottom = "5px";
+    li.style.borderRadius = "5px";
+    li.style.display = "flex";
+    li.style.alignItems = "center";
+    li.style.justifyContent = "space-between";
+
+    let icona = "";
+
+    // Imposta icona e colore di sfondo in base all'emozione
+    if(item.includes("[felice]")) { icona = "😀"; li.style.backgroundColor = "#d4edda"; li.style.color = "green"; }
+    else if(item.includes("[triste]")) { icona = "😢"; li.style.backgroundColor = "#d1ecf1"; li.style.color = "blue"; }
+    else if(item.includes("[arrabbiato]")) { icona = "😡"; li.style.backgroundColor = "#f8d7da"; li.style.color = "red"; }
+    else if(item.includes("[sorpreso]")) { icona = "😲"; li.style.backgroundColor = "#fff3cd"; li.style.color = "orange"; }
+    else if(item.includes("[ansioso]")) { icona = "😰"; li.style.backgroundColor = "#e2d6f3"; li.style.color = "purple"; }
+
+    // Testo del pensiero con icona
+    const testoSpan = document.createElement("span");
+    testoSpan.textContent = icona + " " + item;
+
+    // Pulsante elimina
+    const btnElimina = document.createElement("button");
+    btnElimina.textContent = "Elimina";
+    btnElimina.style.marginLeft = "10px";
+    btnElimina.onclick = function() { eliminaPensiero(index); };
+
+    li.appendChild(testoSpan);
+    li.appendChild(btnElimina);
+    ul.appendChild(li);
+  });
+}
+
+
+    function eliminaPensiero(index) {
+      let lista = JSON.parse(localStorage.getItem('diario')) || [];
+      lista.splice(index, 1);
+      localStorage.setItem('diario', JSON.stringify(lista));
+      mostraLista();
+    }
+
+    // Mostra subito i pensieri salvati all'apertura
+    mostraLista();
+  </script>
+</body>
+</html>
